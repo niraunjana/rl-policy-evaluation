@@ -106,6 +106,8 @@ else:
 ![image](https://github.com/user-attachments/assets/c08ce3a8-bf54-468e-b456-a14658f55190)
 
 
+## RESULT:
 
+Thus , to develop a python program to evaluate the given policy is implemented successfully.
 
 
