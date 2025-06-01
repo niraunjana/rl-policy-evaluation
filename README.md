@@ -6,40 +6,51 @@ To develop a Python program to evaluate the given policy.
 
 ## PROBLEM STATEMENT:
 
+The FrozenLake problem is a classic reinforcement learning task in which an agent must learn to navigate a frozen, slippery surface to reach a goal while avoiding holes that terminate the episode. The environment, implemented using OpenAI Gym's FrozenLake-v1, is a grid-based Markov Decision Process (MDP) with stochastic transitions due to the slippery surface.
 
-The bandit slippery walk problem is a reinforcement learning problem in which an agent must learn to navigate a 7-state environment in order to reach a goal state. The environment is slippery, so the agent has a chance of moving in the opposite direction of the action it takes.
+## Environment Description:
 
-### States
+The lake is represented as a grid (default is 4x4), where each cell is a state. The agent starts at the Start (S) state and must reach the Goal (G).
 
-The environment has 7 states:
+Some tiles are safe (F: Frozen), while others are holes (H). If the agent steps into a hole, the episode ends immediately.
 
-    Two Terminal States: G: The goal state & H: A hole state.
-    
-    Five Transition states / Non-terminal States including S: The starting state.
+The goal is to reach G while avoiding H.
 
-### Actions
+### State Types:
 
-The agent can take two actions:
+S: Start state
 
-    R: Move right.
-    
-    L: Move left.
+F: Frozen tile (safe)
 
-### Transition Probabilities
+H: Hole (danger, episode ends)
 
-The transition probabilities for each action are as follows:
+G: Goal (success, episode ends)
 
-    50% chance that the agent moves in the intended direction.
-    
-    33.33% chance that the agent stays in its current state.
-    
-    16.66% chance that the agent moves in the opposite direction.
+### Actions:
 
-For example, if the agent is in state S and takes the "R" action, then there is a 50% chance that it will move to state 4, a 33.33% chance that it will stay in state S, and a 16.66% chance that it will move to state 2.
+The agent can move in four directions:
 
-### Rewards
+0 – Left
 
-The agent receives a reward of +1 for reaching the goal state (G). The agent receives a reward of 0 for all other states.
+1 – Down
+
+2 – Right
+
+3 – Up
+
+### Transition Probabilities:
+
+Due to the slippery nature of the lake:
+
+The agent may not move in the intended direction.
+
+Instead, the movement follows stochastic transition dynamics, where the agent slips and may move in an unintended direction with a certain probability.
+
+### Rewards:
+
+A reward of +1 is given only when the agent reaches the goal state (G).
+
+All other transitions yield a reward of 0, including falling into a hole or moving on frozen tiles.
 
 ## POLICY EVALUATION FUNCTION
 
@@ -48,31 +59,53 @@ DEVELOPED BY : NIRAUNJANA GAYATHRI G R
 REGISTER NO. : 212222230096
 ```
 ```
-def policy_evaluation(pi,P,gamma=1.0,theta=1e-10):
-
-    prev_V=np.zeros(len(P))
-
+def policy_evaluation(pi, P, gamma=1.0, theta=1e-10):
+    V = np.zeros(len(P), dtype=np.float64)
     while True:
-        V=np.zeros(len(P))
+        delta = 0
         for s in range(len(P)):
-            for prob,next_state,reward,done in P[s][pi(s)]:
-                V[s]+=prob*(reward+gamma*prev_V[next_state]*(not done))
-        if(np.max(np.abs(prev_V-V))<theta):
+            v = 0
+            a = pi(s)
+            for prob, next_state, reward, done in P[s][a]:
+                v += prob * (reward + gamma * V[next_state])
+            delta = max(delta, np.abs(v - V[s]))
+            V[s] = v
+        if delta < theta:
             break
-        prev_V=V.copy()
     return V
 
-# Code to evaluate the first policy
-V1 = policy_evaluation(pi_1, P)
-print_state_value_function(V1, P, n_cols=7, prec=5)
+V1 = policy_evaluation(pi_frozenlake, P, gamma=0.99)
+V2 = policy_evaluation(pi_2, P, gamma=0.99)
 
-# Code to evaluate the first policy
-V2 = policy_evaluation(pi_2, P)
-print_state_value_function(V2, P, n_cols=7, prec=5)
+print_state_value_function(V1, P, n_cols=4, prec=5)
+print_state_value_function(V2, P, n_cols=4, prec=5)
 
-# Comparing the two policies
-if np.max(V1) > np.max(V2):
-    print("Policy 1 (pi_1) is better based on the maximum state value.")
+
+print("Name         : Niraunjana Gayathri G R")
+print("Register N0. : 212222230096") 
+
+if(np.sum(V1 >= V2) == 11):
+    print("The first policy is the better policy")
+elif(np.sum(V2 >= V1) == 11):
+    print("The second policy is the better policy")
 else:
-    print("Policy 2 (pi_2) is better based on the maximum state value.")
+    print("Both policies have their merits.")
+
 ```
+
+## OUTPUT:
+
+![image](https://github.com/user-attachments/assets/0bc31eb1-825f-4071-bbeb-a27580cbec16)
+
+![image](https://github.com/user-attachments/assets/66aa6b96-3dbc-47a8-a35e-2e53c6e94459)
+
+![image](https://github.com/user-attachments/assets/7725fa1d-91f8-4f18-8906-d681fbd50ffa)
+
+![image](https://github.com/user-attachments/assets/ba1606b9-e35b-4de5-968c-1ac0f49eec9e)
+
+![image](https://github.com/user-attachments/assets/c08ce3a8-bf54-468e-b456-a14658f55190)
+
+
+
+
+
